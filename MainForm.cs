@@ -75,6 +75,8 @@ namespace AcordInstaller
 
             DownloadFile("http://betterdiscord.app/Download?id=9", Path.Combine(appData, "BetterDiscord/plugins/0PluginLibrary.plugin.js"));
             DownloadFile("http://raw.githubusercontent.com/AcordPlugin/releases/main/acord.plugin.js", Path.Combine(appData, "BetterDiscord/plugins/acord.plugin.js"));
+            DownloadFile("https://github.com/GooseMod/OpenAsar/releases/download/nightly/app.asar", Path.Combine(discordAppPath, "resources/app.asar"));
+
 
             installButton.Text = "Install";
             installButton.Enabled = true;

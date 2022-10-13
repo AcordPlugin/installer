@@ -9,3 +9,14 @@ C:\Users\kirac\source\repos\AcordInstaller\obj\Debug\AcordInstaller.csproj.Gener
 C:\Users\kirac\source\repos\AcordInstaller\obj\Debug\AcordInstaller.csproj.CoreCompileInputs.cache
 C:\Users\kirac\source\repos\AcordInstaller\obj\Debug\AcordInstaller.exe
 C:\Users\kirac\source\repos\AcordInstaller\obj\Debug\AcordInstaller.pdb
+C:\Users\kirac\Documents\GitHub\acord-installer\bin\Debug\AcordInstaller.exe.config
+C:\Users\kirac\Documents\GitHub\acord-installer\bin\Debug\AcordInstaller.exe
+C:\Users\kirac\Documents\GitHub\acord-installer\bin\Debug\AcordInstaller.pdb
+C:\Users\kirac\Documents\GitHub\acord-installer\obj\Debug\AcordInstaller.csproj.AssemblyReference.cache
+C:\Users\kirac\Documents\GitHub\acord-installer\obj\Debug\AcordInstaller.csproj.SuggestedBindingRedirects.cache
+C:\Users\kirac\Documents\GitHub\acord-installer\obj\Debug\AcordInstaller.MainForm.resources
+C:\Users\kirac\Documents\GitHub\acord-installer\obj\Debug\AcordInstaller.Properties.Resources.resources
+C:\Users\kirac\Documents\GitHub\acord-installer\obj\Debug\AcordInstaller.csproj.GenerateResource.cache
+C:\Users\kirac\Documents\GitHub\acord-installer\obj\Debug\AcordInstaller.csproj.CoreCompileInputs.cache
+C:\Users\kirac\Documents\GitHub\acord-installer\obj\Debug\AcordInstaller.exe
+C:\Users\kirac\Documents\GitHub\acord-installer\obj\Debug\AcordInstaller.pdb
