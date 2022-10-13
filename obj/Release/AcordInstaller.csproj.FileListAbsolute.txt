@@ -1,0 +1,11 @@
+C:\Users\kirac\source\repos\AcordInstaller\bin\Release\AcordInstaller.exe.config
+C:\Users\kirac\source\repos\AcordInstaller\bin\Release\AcordInstaller.exe
+C:\Users\kirac\source\repos\AcordInstaller\bin\Release\AcordInstaller.pdb
+C:\Users\kirac\source\repos\AcordInstaller\obj\Release\AcordInstaller.csproj.AssemblyReference.cache
+C:\Users\kirac\source\repos\AcordInstaller\obj\Release\AcordInstaller.csproj.SuggestedBindingRedirects.cache
+C:\Users\kirac\source\repos\AcordInstaller\obj\Release\AcordInstaller.MainForm.resources
+C:\Users\kirac\source\repos\AcordInstaller\obj\Release\AcordInstaller.Properties.Resources.resources
+C:\Users\kirac\source\repos\AcordInstaller\obj\Release\AcordInstaller.csproj.GenerateResource.cache
+C:\Users\kirac\source\repos\AcordInstaller\obj\Release\AcordInstaller.csproj.CoreCompileInputs.cache
+C:\Users\kirac\source\repos\AcordInstaller\obj\Release\AcordInstaller.exe
+C:\Users\kirac\source\repos\AcordInstaller\obj\Release\AcordInstaller.pdb

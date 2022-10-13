@@ -78,6 +78,8 @@ namespace AcordInstaller
 
             installButton.Text = "Install";
             installButton.Enabled = true;
+
+            MessageBox.Show($"Installation done for {destinationComboBox.Text}!", "Acord Installer");
         }
 
         public string HTTPGet(string uri, bool json = false)
