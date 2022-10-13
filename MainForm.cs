@@ -59,10 +59,7 @@ namespace AcordInstaller
             Directory.CreateDirectory(Path.Combine(appData, "BetterDiscord/data"));
             Directory.CreateDirectory(Path.Combine(appData, "BetterDiscord/plugins"));
 
-
-            string discordAppPath = Directory.GetDirectories(Path.Combine(localAppData, destinationComboBox.Text)).Where(i => Path.GetFileName(i).StartsWith("app-")).First();
-
-            Directory.CreateDirectory(Path.Combine(discordAppPath, "resources/app"));
+            string[] appPaths = Directory.GetDirectories(Path.Combine(localAppData, destinationComboBox.Text)).Where(i => Path.GetFileName(i).StartsWith("app-")).ToArray();
 
             string releasesResponse = HTTPGet("http://api.github.com/repos/BetterDiscord/BetterDiscord/releases/latest", true);
             Match match1 = Regex.Match(releasesResponse, @"(https:\/\/github\.com\/BetterDiscord\/BetterDiscord\/releases\/download\/[^/]+\/betterdiscord\.asar)");
@@ -70,13 +67,19 @@ namespace AcordInstaller
             string betterAsarPath = Path.Combine(appData, "BetterDiscord/data/betterdiscord.asar");
             DownloadFile(match1.Groups[0].ToString(), betterAsarPath);
 
-            File.WriteAllText(Path.Combine(discordAppPath, "resources/app/index.js"), $@"require(""{betterAsarPath.Replace("\\", "\\\\")}"");");
-            File.WriteAllText(Path.Combine(discordAppPath, "resources/app/package.json"), "{\"name\":\"betterdiscord\",\"main\":\"index.js\"}");
-
             DownloadFile("http://betterdiscord.app/Download?id=9", Path.Combine(appData, "BetterDiscord/plugins/0PluginLibrary.plugin.js"));
             DownloadFile("http://raw.githubusercontent.com/AcordPlugin/releases/main/acord.plugin.js", Path.Combine(appData, "BetterDiscord/plugins/acord.plugin.js"));
-            DownloadFile("https://github.com/GooseMod/OpenAsar/releases/download/nightly/app.asar", Path.Combine(discordAppPath, "resources/app.asar"));
 
+            for (int i = 0; i < appPaths.Length; i++)
+            {
+                string discordAppPath = appPaths[i];
+
+                Directory.CreateDirectory(Path.Combine(discordAppPath, "resources/app"));
+                File.WriteAllText(Path.Combine(discordAppPath, "resources/app/index.js"), $@"require(""{betterAsarPath.Replace("\\", "\\\\")}"");");
+                File.WriteAllText(Path.Combine(discordAppPath, "resources/app/package.json"), "{\"name\":\"betterdiscord\",\"main\":\"index.js\"}");
+
+                DownloadFile("https://github.com/GooseMod/OpenAsar/releases/download/nightly/app.asar", Path.Combine(discordAppPath, "resources/app.asar"));
+            }
 
             installButton.Text = "Install";
             installButton.Enabled = true;
@@ -111,12 +114,13 @@ namespace AcordInstaller
         {
             foreach (Process clsProcess in Process.GetProcesses())
             {
-                if (clsProcess.ProcessName.Contains(name))
+                
+                if (clsProcess.ProcessName == name)
                 {
                     return true;
                 }
             }
-  
+
             return false;
         }
     }
