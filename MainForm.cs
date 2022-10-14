@@ -112,16 +112,7 @@ namespace AcordInstaller
 
         public bool IsProcessOpen(string name)
         {
-            foreach (Process clsProcess in Process.GetProcesses())
-            {
-                
-                if (clsProcess.ProcessName == name)
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            return Process.GetProcessesByName(name).Any();
         }
     }
 }
