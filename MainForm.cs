@@ -47,10 +47,15 @@ namespace AcordInstaller
         private void Install()
         {
 
-            if (IsProcessOpen(destinationComboBox.Text))
+            Process[] processes = Process.GetProcessesByName(destinationComboBox.Text).ToArray();
+
+            string discordExePath = null;
+
+            for (int i = 0; i < processes.Length; i++)
             {
-                MessageBox.Show($"{destinationComboBox.Text} is already running. Please quit {destinationComboBox.Text} first!", "Acord Installer");
-                return;
+                Process process = processes[i];
+                process.Kill();
+                if (discordExePath == null) discordExePath = process.MainModule.FileName;
             }
 
             installButton.Enabled = false;
@@ -84,6 +89,8 @@ namespace AcordInstaller
             installButton.Text = "Install";
             installButton.Enabled = true;
 
+            Process.Start(discordExePath);
+
             MessageBox.Show($"Installation done for {destinationComboBox.Text}!", "Acord Installer");
         }
 
@@ -108,11 +115,6 @@ namespace AcordInstaller
             {
                 client.DownloadFile(uri, path);
             }
-        }
-
-        public bool IsProcessOpen(string name)
-        {
-            return Process.GetProcessesByName(name).Any();
         }
     }
 }
