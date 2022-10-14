@@ -89,7 +89,7 @@ namespace AcordInstaller
             installButton.Text = "Install";
             installButton.Enabled = true;
 
-            Process.Start(discordExePath);
+            if (discordExePath != null) Process.Start(discordExePath);
 
             MessageBox.Show($"Installation done for {destinationComboBox.Text}!", "Acord Installer");
         }
