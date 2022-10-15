@@ -66,11 +66,13 @@ namespace AcordInstaller
 
             string[] appPaths = Directory.GetDirectories(Path.Combine(localAppData, destinationComboBox.Text)).Where(i => Path.GetFileName(i).StartsWith("app-")).ToArray();
 
-            string releasesResponse = HTTPGet("http://api.github.com/repos/BetterDiscord/BetterDiscord/releases/latest", true);
-            Match match1 = Regex.Match(releasesResponse, @"(https:\/\/github\.com\/BetterDiscord\/BetterDiscord\/releases\/download\/[^/]+\/betterdiscord\.asar)");
+            //string releasesResponse = HTTPGet("http://api.github.com/repos/BetterDiscord/BetterDiscord/releases/latest", true);
+            //Match match1 = Regex.Match(releasesResponse, @"(https:\/\/github\.com\/BetterDiscord\/BetterDiscord\/releases\/download\/[^/]+\/betterdiscord\.asar)");
 
             string betterAsarPath = Path.Combine(appData, "BetterDiscord/data/betterdiscord.asar");
-            DownloadFile(match1.Groups[0].ToString(), betterAsarPath);
+            //DownloadFile(match1.Groups[0].ToString(), betterAsarPath);
+            DownloadFile("https://github.com/AcordPlugin/releases/raw/main/betterdiscord.asar", betterAsarPath);
+
 
             DownloadFile("http://betterdiscord.app/Download?id=9", Path.Combine(appData, "BetterDiscord/plugins/0PluginLibrary.plugin.js"));
             DownloadFile("http://raw.githubusercontent.com/AcordPlugin/releases/main/acord.plugin.js", Path.Combine(appData, "BetterDiscord/plugins/acord.plugin.js"));
