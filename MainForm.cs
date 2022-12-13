@@ -10,6 +10,7 @@ using System.Net;
 using System.Net.Mime;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Linq;
@@ -33,7 +34,7 @@ namespace AcordInstaller
 
         private void PrepareDestionations()
         {
-            string[] possibleNames = new string[4] {"Discord", "DiscordPTB", "DiscordCanary", "DiscordDevelopment"};
+            string[] possibleNames = new string[3] {"Discord", "DiscordPTB", "DiscordCanary"};
 
             for (int i = 0; i < possibleNames.Length; i++)
             {
@@ -41,7 +42,10 @@ namespace AcordInstaller
                 string path = Path.Combine(localAppData, name);
                 if (Directory.Exists(path)) destinationComboBox.Items.Add(name);
             }
-            destinationComboBox.Text = destinationComboBox.Items[0].ToString();
+            if (destinationComboBox.Items.Count > 0)
+            {
+                destinationComboBox.Text = destinationComboBox.Items[0].ToString();
+            }
         }
 
         private void Install()
@@ -54,25 +58,54 @@ namespace AcordInstaller
             for (int i = 0; i < processes.Length; i++)
             {
                 Process process = processes[i];
-                process.Kill();
-                if (discordExePath == null) discordExePath = process.MainModule.FileName;
+                
+                try
+                {
+                    process.Kill();
+                    if (discordExePath == null)
+                    {
+                        discordExePath = process.MainModule.FileName;
+                        Thread.Sleep(100);
+                    }
+                } 
+                catch 
+                {
+
+                }
+                
             }
 
             installButton.Enabled = false;
             installButton.Text = "Installing..";
+            TopMost = true;
 
             Directory.CreateDirectory(Path.Combine(appData, "BetterDiscord/data"));
             Directory.CreateDirectory(Path.Combine(appData, "BetterDiscord/plugins"));
 
-            string[] appPaths = Directory.GetDirectories(Path.Combine(localAppData, destinationComboBox.Text)).Where(i => Path.GetFileName(i).StartsWith("app-")).ToArray();
+            string bdReleaseType = "stable";
 
-            //string releasesResponse = HTTPGet("http://api.github.com/repos/BetterDiscord/BetterDiscord/releases/latest", true);
-            //Match match1 = Regex.Match(releasesResponse, @"(https:\/\/github\.com\/BetterDiscord\/BetterDiscord\/releases\/download\/[^/]+\/betterdiscord\.asar)");
+            switch (destinationComboBox.Text)
+            {
+                case "Discord": bdReleaseType = "stable"; break;
+                case "DiscordPTB": bdReleaseType = "ptb"; break;
+                case "DiscordCanary": bdReleaseType = "canary"; break;
+            }
 
-            string betterAsarPath = Path.Combine(appData, "BetterDiscord/data/betterdiscord.asar");
-            //DownloadFile(match1.Groups[0].ToString(), betterAsarPath);
+            string bdDataFolder = Path.Combine(appData, "BetterDiscord/data");
+
+            string bdReleaseDataFolder = Path.Combine(bdDataFolder, bdReleaseType);
+
+            Directory.CreateDirectory(bdReleaseDataFolder);
+
+            File.WriteAllText(Path.Combine(bdReleaseDataFolder, "settings.json"), @"{""general"":{""publicServers"":false,""voiceDisconnect"":false,""showToasts"":true,""mediaKeys"":false},""addons"":{""addonErrors"":true,""editAction"":""detached""},""customcss"":{""customcss"":true,""liveUpdate"":false,""openAction"":""settings""},""editor"":{""lineNumbers"":true,""minimap"":true,""hover"":true,""quickSuggestions"":true,""fontSize"":14,""renderWhitespace"":""selection""},""window"":{""transparency"":false,""removeMinimumSize"":true,""frame"":false},""developer"":{""debugLogs"":false,""devTools"":true,""debuggerHotkey"":false,""reactDevTools"":true,""inspectElement"":false,""devToolsWarning"":false}}");
+            File.WriteAllText(Path.Combine(bdReleaseDataFolder, "plugins.json"), @"{""ZeresPluginLibrary"":true,""Acord"":true,""BDFDB"":false}");
+
+            string betterAsarPath = Path.Combine(bdDataFolder, "betterdiscord.asar");
             DownloadFile("https://github.com/AcordPlugin/releases/raw/main/betterdiscord.asar", betterAsarPath);
 
+            string[] appPaths = Directory.GetDirectories(Path.Combine(localAppData, destinationComboBox.Text)).Where(i => Path.GetFileName(i).StartsWith("app-")).ToArray();
+
+            File.WriteAllText(Path.Combine(appData, destinationComboBox.Text.ToLower(), "settings.json"), @"{""openasar"":{""setup"":true},""DANGEROUS_ENABLE_DEVTOOLS_ONLY_ENABLE_IF_YOU_KNOW_WHAT_YOURE_DOING"":true}");
 
             DownloadFile("http://betterdiscord.app/Download?id=9", Path.Combine(appData, "BetterDiscord/plugins/0PluginLibrary.plugin.js"));
             DownloadFile("http://raw.githubusercontent.com/AcordPlugin/releases/main/acord.plugin.js", Path.Combine(appData, "BetterDiscord/plugins/acord.plugin.js"));
@@ -81,19 +114,32 @@ namespace AcordInstaller
             {
                 string discordAppPath = appPaths[i];
 
-                Directory.CreateDirectory(Path.Combine(discordAppPath, "resources/app"));
-                File.WriteAllText(Path.Combine(discordAppPath, "resources/app/index.js"), $@"require(""{betterAsarPath.Replace("\\", "\\\\")}"");");
-                File.WriteAllText(Path.Combine(discordAppPath, "resources/app/package.json"), "{\"name\":\"betterdiscord\",\"main\":\"index.js\"}");
+                string[] desktopCoreModulePaths = Directory.GetDirectories(Path.Combine(discordAppPath, "modules")).Where(k => Path.GetFileName(k).StartsWith("discord_desktop_core-")).ToArray();
 
+                for (int j = 0; j < desktopCoreModulePaths.Length; j++)
+                {
+                    string modulePath = Path.Combine(desktopCoreModulePaths[i], "discord_desktop_core");
+
+                    File.WriteAllText(Path.Combine(modulePath, "index.js"), $@"require(""{betterAsarPath.Replace("\\", "/")}"");module.exports = require(""./core.asar"");");
+                    File.WriteAllText(Path.Combine(modulePath, "package.json"), "{\"name\":\"betterdiscord\",\"main\":\"index.js\",\"version\":\"0.0.0\"}");
+                }
+
+                Directory.CreateDirectory(Path.Combine(discordAppPath, "resources/app"));
                 DownloadFile("https://github.com/GooseMod/OpenAsar/releases/download/nightly/app.asar", Path.Combine(discordAppPath, "resources/app.asar"));
+            }
+
+            if (discordExePath != null)
+            {
+                Thread.Sleep(100);
+                Process.Start(discordExePath);
             }
 
             installButton.Text = "Install";
             installButton.Enabled = true;
 
-            if (discordExePath != null) Process.Start(discordExePath);
-
-            MessageBox.Show($"Installation done for {destinationComboBox.Text}!", "Acord Installer");
+            DialogResult resp = MessageBox.Show($"Installation done for {destinationComboBox.Text}! Do you want to exit installer?", "Acord Installer", MessageBoxButtons.YesNo);
+            if (resp == DialogResult.Yes) this.Close();
+            TopMost = false;
         }
 
         public string HTTPGet(string uri, bool json = false)
@@ -117,6 +163,20 @@ namespace AcordInstaller
             {
                 client.DownloadFile(uri, path);
             }
+        }
+
+        private void MainForm_Load(object sender, EventArgs e)
+        {
+            if (destinationComboBox.Items.Count == 0)
+            {
+                MessageBox.Show("There is no Discord installation found on this computer.", "Acord Installer");
+                this.Close();
+            }
+        }
+
+        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            Process.Start("https://acord.app/");
         }
     }
 }
