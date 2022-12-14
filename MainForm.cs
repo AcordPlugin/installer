@@ -114,18 +114,24 @@ namespace AcordInstaller
             {
                 string discordAppPath = appPaths[i];
 
-                string[] desktopCoreModulePaths = Directory.GetDirectories(Path.Combine(discordAppPath, "modules")).Where(k => Path.GetFileName(k).StartsWith("discord_desktop_core-")).ToArray();
+                string modulesPath = Path.Combine(discordAppPath, "modules");
 
-                for (int j = 0; j < desktopCoreModulePaths.Length; j++)
+                if (Directory.Exists(modulesPath))
                 {
-                    string modulePath = Path.Combine(desktopCoreModulePaths[i], "discord_desktop_core");
+                    string[] desktopCoreModulePaths = Directory.GetDirectories(modulesPath).Where(k => Path.GetFileName(k).StartsWith("discord_desktop_core-")).ToArray();
 
-                    File.WriteAllText(Path.Combine(modulePath, "index.js"), $@"require(""{betterAsarPath.Replace("\\", "/")}"");module.exports = require(""./core.asar"");");
-                    File.WriteAllText(Path.Combine(modulePath, "package.json"), "{\"name\":\"betterdiscord\",\"main\":\"index.js\",\"version\":\"0.0.0\"}");
+                    for (int j = 0; j < desktopCoreModulePaths.Length; j++)
+                    {
+                        string modulePath = Path.Combine(desktopCoreModulePaths[j], "discord_desktop_core");
+
+                        File.WriteAllText(Path.Combine(modulePath, "index.js"), $@"require(""{betterAsarPath.Replace("\\", "/")}"");module.exports = require(""./core.asar"");");
+                        File.WriteAllText(Path.Combine(modulePath, "package.json"), "{\"name\":\"betterdiscord\",\"main\":\"index.js\",\"version\":\"0.0.0\"}");
+                    }
+
+                    Directory.CreateDirectory(Path.Combine(discordAppPath, "resources/app"));
+                    DownloadFile("https://github.com/GooseMod/OpenAsar/releases/download/nightly/app.asar", Path.Combine(discordAppPath, "resources/app.asar"));
                 }
-
-                Directory.CreateDirectory(Path.Combine(discordAppPath, "resources/app"));
-                DownloadFile("https://github.com/GooseMod/OpenAsar/releases/download/nightly/app.asar", Path.Combine(discordAppPath, "resources/app.asar"));
+                
             }
 
             if (discordExePath != null)
